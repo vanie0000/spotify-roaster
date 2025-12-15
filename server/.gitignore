@@ -1,0 +1,10 @@
+# Dependencies
+node_modules/
+
+# Environment variables (Sensitive!)
+.env
+.DS_Store
+
+# Build outputs
+dist/
+build/
