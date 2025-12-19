@@ -4,6 +4,7 @@ import "./App.css";
 function App() {
   const [token, setToken] = useState(null);
   const [topArtists, setTopArtists] = useState([]);
+  const [roast, setRoast] = useState(null);
   const [status, setStatus] = useState("");
 
   useEffect(() => {
@@ -20,35 +21,38 @@ function App() {
   const handleAnalyze = async () => {
     if (!token) return;
 
-    setStatus("Fetching data from Spotify and saving to DB...");
+    setStatus("🔥 Roasting your music taste... (this might take a second)");
+    setRoast(null);
 
     try {
-      const response = await fetch("http://127.0.0.1:8888/save-stats", {
+      const response = await fetch("http://localhost:8888/save-stats", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ accessToken: token }),
       });
 
-      if (!response.ok) {
-        throw new Error("Backend failed to save data");
-      }
+      if (!response.ok) throw new Error("Backend failed");
 
       const data = await response.json();
 
-      console.log("Success! Data from backend:", data);
-
       setTopArtists(data.topArtists);
-      setStatus("Data saved to MongoDB! Here are your top artists:");
+      setRoast(data.roast);
+      setStatus("✅ Done!");
     } catch (error) {
       console.error("Error:", error);
-      setStatus("Something went wrong. Check console.");
+      setStatus("❌ Something went wrong.");
     }
   };
 
   return (
-    <div className="App" style={{ textAlign: "center", padding: "50px" }}>
+    <div
+      className="App"
+      style={{
+        textAlign: "center",
+        padding: "50px",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
       <h1>Spotify Stats Roaster 🔥</h1>
 
       {!token ? (
@@ -58,6 +62,10 @@ function App() {
               padding: "15px 30px",
               fontSize: "18px",
               cursor: "pointer",
+              backgroundColor: "#1DB954",
+              color: "white",
+              border: "none",
+              borderRadius: "25px",
             }}
           >
             Login with Spotify
@@ -65,38 +73,57 @@ function App() {
         </a>
       ) : (
         <div>
-          <p>
-            ✅ <strong>Connected to Spotify</strong>
-          </p>
-
           <button
             onClick={handleAnalyze}
             style={{
               padding: "15px 30px",
               fontSize: "18px",
               cursor: "pointer",
+              backgroundColor: "black",
+              color: "white",
+              border: "none",
+              borderRadius: "25px",
             }}
           >
-            Analyze My Taste & Save to DB
+            Roast My Taste
           </button>
 
           <p style={{ marginTop: "20px", fontWeight: "bold" }}>{status}</p>
 
-          {topArtists.length > 0 && (
+          {/* NEW: The Roast Box */}
+          {roast && (
             <div
               style={{
-                marginTop: "30px",
-                textAlign: "left",
-                display: "inline-block",
+                backgroundColor: "#ffcccc",
+                border: "2px solid #ff0000",
+                borderRadius: "10px",
+                padding: "20px",
+                margin: "30px auto",
+                maxWidth: "600px",
+                boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
               }}
             >
-              <h3>Your Top Artists:</h3>
-              <ul>
-                {topArtists.map((artist, index) => (
-                  <li
-                    key={index}
-                    style={{ fontSize: "18px", marginBottom: "5px" }}
-                  >
+              <h2 style={{ margin: "0 0 10px 0", color: "#cc0000" }}>
+                💀 The Verdict
+              </h2>
+              <p
+                style={{
+                  fontSize: "1.3em",
+                  fontStyle: "italic",
+                  lineHeight: "1.5",
+                }}
+              >
+                "{roast}"
+              </p>
+            </div>
+          )}
+
+          {topArtists.length > 0 && (
+            <div style={{ marginTop: "40px" }}>
+              <h3>Based on these artists:</h3>
+              <ul style={{ listStyle: "none", padding: 0 }}>
+                {topArtists.slice(0, 5).map((artist, index) => (
+                  <li key={index} style={{ fontSize: "18px", margin: "5px 0" }}>
                     🎵 {artist}
                   </li>
                 ))}
