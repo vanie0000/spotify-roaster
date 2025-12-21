@@ -1,42 +1,105 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+:root {
+  --brat-green: #8ace00;
+  --brat-black: #000000;
+}
+
+body {
+  background-color: var(--brat-green);
+  color: var(--brat-black);
+  font-family: 'Arial Narrow', 'Arial Black', sans-serif; 
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-transform: lowercase; 
+}
+
+.receipts-section {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.brat-container {
+  width: 90%;
+  max-width: 500px;
   text-align: center;
+  padding: 20px;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.brat-header {
+  font-size: 3rem;
+  margin-bottom: 40px;
+  letter-spacing: -2px;
+  filter: blur(0.5px); 
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.brat-button {
+  background-color: var(--brat-black);
+  color: var(--brat-green);
+  font-family: 'Arial Black', sans-serif;
+  font-size: 1.2rem;
+  padding: 15px 30px;
+  border: none;
+  cursor: pointer;
+  text-transform: lowercase;
+  width: 100%;
+  max-width: 300px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.brat-button:hover {
+  background-color: white;
+  color: black;
 }
 
-.card {
-  padding: 2em;
+.brat-status {
+  margin-top: 20px;
+  font-weight: bold;
+  font-size: 0.9rem;
 }
 
-.read-the-docs {
-  color: #888;
+.brat-roast-box {
+  background-color: var(--brat-black);
+  color: var(--brat-green);
+  padding: 20px;
+  margin: 40px 0;
+  font-family: 'Courier New', monospace; 
+}
+
+.brat-subheader {
+  background-color: var(--brat-black);
+  color: var(--brat-green);
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.roast-text {
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+.brat-list {
+  list-style-type: none;
+  padding: 0;
+  text-align: left;
+  min-width: 200px;
+}
+
+.brat-list-item {
+  font-size: 1.5rem;
+  border-bottom: 1px solid var(--brat-black);
+  padding: 10px 0;
+  letter-spacing: -1px;
+}
+
+.brat-footer {
+  margin-top: 50px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  opacity: 0.8;
 }
