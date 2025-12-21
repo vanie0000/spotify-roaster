@@ -96,7 +96,7 @@ app.post("/save-stats", async (req, res) => {
             Top Tracks: ${topTracks.join(", ")}.
             
             Roast their music taste in 2-3 short, punchy sentences. 
-            Be specific about the artists they listen to. make it funny.
+            Be specific about the artists they listen to. Make it funny.
         `;
 
     const result = await model.generateContent(prompt);
