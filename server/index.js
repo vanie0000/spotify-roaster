@@ -5,11 +5,21 @@ const axios = require("axios");
 const mongoose = require("mongoose");
 const UserStats = require("./models/UserStats");
 const cors = require("cors");
-
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const rateLimit = require("express-rate-limit");
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  max: 5,
+  message: "Too many roasts! You're burning the server. Try again in 15 mins.",
+});
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173', 
+    methods: ['POST', 'GET'],
+    credentials: true
+}));
 app.use(express.json());
 
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
@@ -64,9 +74,15 @@ app.get("/callback", async (req, res) => {
   }
 });
 
-app.post("/save-stats", async (req, res) => {
+app.post("/save-stats", limiter, async (req, res) => {
   const { accessToken } = req.body;
-  if (!accessToken) return res.status(400).send("No access token provided");
+  if (
+    !accessToken ||
+    typeof accessToken !== "string" ||
+    accessToken.length > 500
+  ) {
+    return res.status(400).send("Invalid Access Token format");
+  }
 
   try {
     const artistsResponse = await axios.get(
