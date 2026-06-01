@@ -25,7 +25,7 @@ function App() {
     setRoast(null);
 
     try {
-      const response = await fetch("http://localhost:8888/save-stats", {
+      const response = await fetch("/save-stats", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ accessToken: token }),
@@ -48,7 +48,7 @@ function App() {
       <h1 className="brat-header">spotify stats roaster</h1>
 
       {!token ? (
-        <a href="http://127.0.0.1:8888/login">
+        <a href="/login">
           <button className="brat-button">login with spotify</button>
         </a>
       ) : (

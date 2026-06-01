@@ -1,3 +1,4 @@
+const path = require("path");
 require("dotenv").config();
 const express = require("express");
 const querystring = require("querystring");
@@ -9,18 +10,22 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const rateLimit = require("express-rate-limit");
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
+  windowMs: 15 * 60 * 1000,
   max: 5,
   message: "Too many roasts! You're burning the server. Try again in 15 mins.",
 });
 
 const app = express();
-app.use(cors({
-    origin: 'http://localhost:5173', 
-    methods: ['POST', 'GET'],
-    credentials: true
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["POST", "GET"],
+    credentials: true,
+  }),
+);
 app.use(express.json());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, '../client/dist')));
 
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
@@ -30,8 +35,8 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("MongoDB Connection Error:", err));
 
 app.get("/login", (req, res) => {
   const scope = "user-top-read";
@@ -42,12 +47,18 @@ app.get("/login", (req, res) => {
         client_id: CLIENT_ID,
         scope: scope,
         redirect_uri: REDIRECT_URI,
-      })
+      }),
   );
 });
 
 app.get("/callback", async (req, res) => {
   const code = req.query.code || null;
+
+  if (!code) {
+    console.error("No authorization code provided by Spotify.");
+    return res.status(400).send("Login failed: Missing authorization code.");
+  }
+
   try {
     const response = await axios({
       method: "post",
@@ -55,20 +66,19 @@ app.get("/callback", async (req, res) => {
       data: querystring.stringify({
         grant_type: "authorization_code",
         code: code,
-        redirect_uri: REDIRECT_URI,
+        redirect_uri: REDIRECT_URI, 
       }),
       headers: {
         "content-type": "application/x-www-form-urlencoded",
         Authorization: `Basic ${new Buffer.from(
-          `${CLIENT_ID}:${CLIENT_SECRET}`
+          `${CLIENT_ID}:${CLIENT_SECRET}`,
         ).toString("base64")}`,
       },
     });
     const accessToken = response.data.access_token;
     const refreshToken = response.data.refresh_token;
-    res.redirect(
-      `http://localhost:5173/?access_token=${accessToken}&refresh_token=${refreshToken}`
-    );
+
+    res.redirect(`/?access_token=${accessToken}&refresh_token=${refreshToken}`);
   } catch (error) {
     res.send(error);
   }
@@ -89,13 +99,13 @@ app.post("/save-stats", limiter, async (req, res) => {
       "https://api.spotify.com/v1/me/top/artists?limit=10",
       {
         headers: { Authorization: `Bearer ${accessToken}` },
-      }
+      },
     );
     const tracksResponse = await axios.get(
       "https://api.spotify.com/v1/me/top/tracks?limit=10",
       {
         headers: { Authorization: `Bearer ${accessToken}` },
-      }
+      },
     );
 
     const topArtists = artistsResponse.data.items.map((item) => item.name);
@@ -137,6 +147,10 @@ app.post("/save-stats", limiter, async (req, res) => {
   }
 });
 
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+});
+
 app.listen(8888, () => {
-  console.log("✅ Server running on http://127.0.0.1:8888");
+  console.log("Server running on http://127.0.0.1:8888");
 });
